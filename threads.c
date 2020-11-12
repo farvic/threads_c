@@ -72,9 +72,10 @@ int main(){
 			// sum = 0;
 			for (int j=0; j < columnsB; j++) {
 				sum = 0;
+				resultMatrix[(i*columnsB) + j] = 0;
 				for (int k=0; k < rowsB ; k++) {
 					// sum += matrixA[(i*columnsA)+k] * matrixB[(rowsB*k)+j];
-					sum += matrixA[i][k] * matrixB[k][j];
+					sum = sum + matrixA[i][k] * matrixB[k][j];
 				}
 				/**
 				 matrixA[i][k] * matrixB[k][j] 
