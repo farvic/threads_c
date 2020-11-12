@@ -9,7 +9,7 @@
 int main(){
     char c, buffer[50];
 	uint32_t matrixNumber, rowsA, columnsA, rowsB, columnsB, matrixCounter;
-	float **matrixA, **matrixB, *resultMatrix, sum;
+	float *matrixA, *matrixB, *resultMatrix, sum;
 
 	//FILE * file = fopen (arquivo[1] , " r " ) ;
 	FILE *file = fopen("pthread.input","r");
@@ -26,7 +26,7 @@ int main(){
 	// columns = atoi(buffer);
 	// printf("MatrixssNumbers: %d\nRows:%d\nColumns:%d\n",matrixNumber,rows,columns);
     // matrixA = malloc(matrixNumber * sizeof(float));
-    // resultMatrix = malloc(matrixNumber * sizeof(float));
+    resultMatrix = malloc(matrixNumber * sizeof(float));
     
     
 	while(!feof(file)) {
@@ -34,15 +34,14 @@ int main(){
 		rowsA = atoi(buffer);
 		fscanf(file,"%s",&buffer);
 		columnsA = atoi(buffer);
-		matrixA = malloc(rowsA * sizeof(float));
+		matrixA = malloc(rowsA * columnsA * sizeof(float));
 		for (int i=0; i < rowsA; i++) {
-			matrixA[i] = malloc(columnsA * sizeof(float));
 			for (int j=0; j < columnsA; j++) {
         		fscanf(file,"%s",&buffer);
                 // printf("%s ",buffer);
-				matrixA[i][j] = atof(buffer);
-                if (matrixA[i][j] >= 0) printf(" ");
-				printf("%0.2f ",matrixA[i][j]);
+				matrixA[(i*columnsA) + j] = atof(buffer);
+                if (matrixA[(i*columnsA) + j] >= 0) printf(" ");
+				printf("%0.2f ",matrixA[(i*columnsA) + j]);
 			}
 			printf("\n");
 		}
@@ -52,16 +51,14 @@ int main(){
 		rowsB = atoi(buffer);
 		fscanf(file,"%s",&buffer);
 		columnsB = atoi(buffer);
-		// matrixB = malloc(rowsB * columnsB * sizeof(float));
-		matrixB = malloc(rowsB * sizeof(float));
+		matrixB = malloc(rowsB * columnsB * sizeof(float));
 		for (int i=0; i < rowsB; i++) {
-			matrixB[i] = malloc(columnsB * sizeof(float));
 			for (int j=0; j < columnsB; j++) {
         		fscanf(file,"%s",&buffer);
                 // printf("%s ",buffer);
-				matrixB[i][j] = atof(buffer);
-                if (matrixB[i][j] >= 0) printf(" ");
-				printf("%0.2f ",matrixB[i][j]);
+				matrixB[(i*columnsB) + j] = atof(buffer);
+                if (matrixB[(i*columnsB) + j] >= 0) printf(" ");
+				printf("%0.2f ",matrixB[(i*columnsB) + j]);
 			}
 			printf("\n");
 		}
@@ -73,8 +70,7 @@ int main(){
 			for (int j=0; j < columnsB; j++) {
 				sum = 0;
 				for (int k=0; k < rowsB ; k++) {
-					// sum += matrixA[(i*columnsA)+k] * matrixB[(rowsB*k)+j];
-					sum += matrixA[i][k] * matrixB[k][j];
+					sum += matrixA[(i*columnsA)+k] * matrixB[(rowsB*k)+j];
 				}
 				/**
 				 matrixA[i][k] * matrixB[k][j] 
