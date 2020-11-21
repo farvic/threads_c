@@ -25,7 +25,7 @@ void matrixProduct(float *resultMatrix, float **matrixA, float **matrixB, uint32
 
 				resultMatrix[(i*columnsB) + j] = sum;
                 if (resultMatrix[(i*columnsB) + j] >= 0) printf(" ");
-				if (resultMatrix[(i*columnsB) + j] < 10) print(" ");
+				if (resultMatrix[(i*columnsB) + j] < 10) printf(" ");
 				printf("%0.2f ",resultMatrix[(i*columnsB) + j]);
 
                 // if (sum >= 0) printf(" ");

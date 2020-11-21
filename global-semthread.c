@@ -9,7 +9,7 @@
 
 uint32_t matrixNumber, rowsA, columnsA, rowsB, columnsB, matrixCounter=0;
 float **matrixA, **matrixB;
-double **resultMatrix;
+float **resultMatrix;
 
 int step_i = 0;
 
@@ -83,7 +83,7 @@ int main(){
 		rowsA = atoi(buffer);
 		fscanf(file,"%s",buffer);
 		columnsA = atoi(buffer);
-		matrixA = malloc(1000 * sizeof(float));
+		matrixA = malloc(1000 * sizeof(float*));
 		for (int i=0; i < rowsA; i++) {
 			matrixA[i] = malloc(1000 * sizeof(float));
 			for (int j=0; j < columnsA; j++) {
@@ -102,7 +102,7 @@ int main(){
 		fscanf(file,"%s",buffer);
 		columnsB = atoi(buffer);
 		// matrixB = malloc(rowsB * columnsB * sizeof(float));
-		matrixB = malloc(1000 * sizeof(float));
+		matrixB = malloc(1000 * sizeof(float*));
 		for (int i=0; i < rowsB; i++) {
 			matrixB[i] = malloc(1000 * sizeof(float));
 			for (int j=0; j < columnsB; j++) {
@@ -115,9 +115,9 @@ int main(){
 			// printf("\n");
 		}
 		// printf("\n");
-		resultMatrix = malloc(rowsA*sizeof(double));
-        for (int m=0; m < rowsA; m++) {
-            resultMatrix[m] = malloc(columnsB*sizeof(double));
+		resultMatrix = malloc((rowsA+1)*sizeof(float*));
+        for (int m=0; m < (rowsA+1); m++) {
+            resultMatrix[m] = malloc((columnsB+1)*sizeof(float));
         }
 		
         printf("M%d\n",matrixCounter);
@@ -126,7 +126,7 @@ int main(){
 
 		matrixCounter++;
 
-
+		printf("Matrix counter: %d",matrixCounter);
         if(matrixCounter == matrixNumber) break;
 		printf("\n");
         // //printf("%s\n",buffer);
@@ -157,7 +157,6 @@ int main(){
 	free(matrixB);
 	free(resultMatrix);
     // printf("%f",matrixA[3][(3*columns)+2]);
-    // free(matrixA);
 
 	fclose(file);
 	return 0;
