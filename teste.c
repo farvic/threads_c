@@ -8,10 +8,10 @@
 #define N 4
 
 
-typedef struct {
-    uint32_t thread;
+struct parameters{
     uint32_t counter;
-} parameters;
+    FILE* output;
+};
 
 // Implementação com as matrizes em uma linha
 
@@ -22,63 +22,45 @@ float **matrixA, **matrixB, **resultMatrix;
 int step_i = 0;
 
 // void matrixProduct(double *resultMatrix, float **matrixA, float **matrixB, uint32_t rowsA, uint32_t rowsB, uint32_t columnsA, uint32_t columnsB){
-void matrixProduct(void* param){
-    printf("hey");
-    parameters p = &param;
-    printf("%d and %d",p->counter,p->thread);
+void matrixProduct(uint32_t* param){
+    uint32_t *p = (uint32_t *)param;
+	float sum = 0;
+    int core = step_i++;
+    uint32_t mult=2;
+    if(p[1] == 2) mult = 1;
+    else mult = 2; 
+    // printf("%d\n",step_i);
+    
+	// for (uint32_t i=0; i < rowsA[p[0]]; i++) {
+    
+    // for (int i= core * rowsA[p[0]]/4; i < (core+1)*rowsA[p[0]]/4; i++) {
+    for (int i= core * rowsA[p[0]]/(2*mult); i < (core+1)*rowsA[p[0]]/(2*mult); i++) {
+        // sum = 0;
+        // printf(" ");
+        for (uint32_t j=0; j < columnsB[p[0]]; j++) {
+            sum = 0;
+            // resultMatrix[(i*columnsB) + j] = 0;
+            for (uint32_t k=0; k < rowsB[p[0]] ; k++) {
+                // sum += matrixA[(i*rowsB)+k] * matrixB[(columnsB*k)+j];
+                sum += matrixA[p[0]][(i*rowsB[p[0]])+k] * matrixB[p[0]][(columnsB[p[0]]*k)+j];
+                // sum = sum + matrixA[i][k] * matrixB[k][j];
+            }
 
-	// float sum = 0;
-    // int core = step_i++;
-    // // printf("%d\n",step_i);
-	// // for (uint32_t i=0; i < rowsA; i++) {
-    // for (int i= core * rowsA[p->counter]/4; i < (core+1)*rowsA[p->counter]/4; i++) {
-    //     // sum = 0;
-    //     // printf(" ");
-    //     for (uint32_t j=0; j < columnsB[p->counter]; j++) {
-    //         sum = 0;
-    //         // resultMatrix[(i*columnsB) + j] = 0;
-    //         for (uint32_t k=0; k < rowsB[p->counter] ; k++) {
-    //             // sum += matrixA[(i*rowsB)+k] * matrixB[(columnsB*k)+j];
-    //             sum += matrixA[p->counter][(i*rowsB[p->counter])+k] * matrixB[p->counter][(columnsB[p->counter]*k)+j];
-    //             // sum = sum + matrixA[i][k] * matrixB[k][j];
-    //         }
-    //         /**
-    //          matrixA[i][k] * matrixB[k][j] 
-                
-    //         */
+            resultMatrix[p[0]][(i*columnsB[p[0]])+j] = sum;
 
-    //         // resultMatrix[(i*columnsB)+j] = sum;
-    //         resultMatrix[matrixCounter][(i*columnsB[matrixCounter])+j] = sum;
+            // if (resultMatrix[matrixCounter][(i*columnsB)+j] >= 0) printf(" ");
+            // if (abs(resultMatrix[matrixCounter][(i*columnsB)+j]) < 10) printf(" ");
+            // if (abs(resultMatrix[matrixCounter][(i*columnsB)+j]) < 100) printf(" ");
+            // printf("%0.2f ",resultMatrix[matrixCounter][(i*columnsB)+j]);
+            // if(i == rowsA -1 && j == columnsB - 1) printf("%0.2f ",resultMatrix[matrixCounter][(i*columnsB)+j]);
 
-    //         // if (resultMatrix[i][j] >= 0) fprintf(output," ");
-    //         // if (abs(resultMatrix[i][j]) < 10) fprintf(output," ");
-    //         // if (abs(resultMatrix[i][j]) < 100) fprintf(output," ",output);
-    //         // fprintf(output,"%0.2f ",resultMatrix[i][j]);
-
-    //         // if (resultMatrix[i][j] >= 0) printf(" ");
-    //         // if (abs(resultMatrix[i][j]) < 10) printf(" ");
-    //         // if (abs(resultMatrix[i][j]) < 100) printf(" ");
-    //         // printf("%0.2f ",resultMatrix[i][j]);
+            // if (sum >= 0) printf(" ");
+            // printf("%0.2f ",sum);
 
 
-    //         // if (resultMatrix[(i*columnsB)+j] >= 0) printf(" ");
-    //         // if (abs(resultMatrix[(i*columnsB)+j]) < 10) printf(" ");
-    //         // if (abs(resultMatrix[(i*columnsB)+j]) < 100) printf(" ");
-    //         // printf("%0.2f ",resultMatrix[(i*columnsB)+j]);
-
-    //         // if (resultMatrix[matrixCounter][(i*columnsB)+j] >= 0) printf(" ");
-    //         // if (abs(resultMatrix[matrixCounter][(i*columnsB)+j]) < 10) printf(" ");
-    //         // if (abs(resultMatrix[matrixCounter][(i*columnsB)+j]) < 100) printf(" ");
-    //         // printf("%0.2f ",resultMatrix[matrixCounter][(i*columnsB)+j]);
-    //         // if(i == rowsA -1 && j == columnsB - 1) printf("%0.2f ",resultMatrix[matrixCounter][(i*columnsB)+j]);
-
-    //         // if (sum >= 0) printf(" ");
-    //         // printf("%0.2f ",sum);
-
-
-    //     }
-    //     printf("\n");
-    // }
+        }
+        // printf("\n");
+    }
 }
 
 
@@ -89,16 +71,15 @@ int main(){
 	// uint32_t matrixNumber, rowsA, columnsA, rowsB, columnsB, matrixCounter=0;
 	// float **matrixA, **matrixB;
 	// double *resultMatrix;
+	
 
 	pthread_t threads[N];
 
     char buffer[20];
 
-    uint32_t args[2];
-
 	//FILE * file = fopen (arquivo[1] , " r " );
-	FILE *file = fopen("pthread.input","r");
-	// FILE *file = fopen("servidorpthread.input","r");
+	// FILE *file = fopen("pthread.input","r");
+	FILE *file = fopen("servidorpthread.input","r");
     FILE *output = fopen("saida.output","w");
 
 	if(file==NULL){
@@ -117,7 +98,8 @@ int main(){
     columnsA = malloc(matrixNumber * sizeof(uint32_t));
     columnsB = malloc(matrixNumber * sizeof(uint32_t));
 
-    parameters *param = malloc(matrixNumber * sizeof(parameters));
+    uint32_t* p = NULL;
+    p = (uint32_t *) malloc(2*sizeof(uint32_t));
     
 	while(!feof(file)) {
         // printf("STEP ATUAL: %d",step_i);
@@ -168,18 +150,22 @@ int main(){
 		// matrixProduct(matrixCounter);
 
 
-
+        // if(rowsA[matrixCounter] == (rowsA[matrixCounter]/4)*4 )
+        //     printf("%d",matrixCounter); 
+        
         // for (uint32_t i = 0; i < N; i++) { 
-        //     int* p; 
-        //     pthread_create(&threads[i], NULL, matrixProduct, matrixCounter); 
-        // } 
-    
+        //     p[0] = matrixCounter;
+        //     p[1] = i;
+        //     // if((rowsA[matrixCounter]/4)  ) 
+        //     pthread_create(&threads[i], NULL, matrixProduct, (void*)(p)); 
+        // }
+        
         // // joining and waiting for all threads to complete 
-        // for (int i = 0; i < N; i++)  
+        // for (uint32_t i = 0; i < N; i++)  
         //     pthread_join(threads[i], NULL);
-        // // int *p;
-        // // pthread_exit(p);
-        // step_i = 0;  
+
+        // pthread_exit(p);
+        step_i = 0;  
 
 
 
@@ -191,7 +177,7 @@ int main(){
 
 		// printf("Matrix counter: %d",matrixCounter);
         if(matrixCounter == matrixNumber) break;
-		printf("\n");
+		// printf("\n");
         // //printf("%s\n",buffer);
         
         
@@ -201,17 +187,34 @@ int main(){
     //     printf("\n");
     // }
     // matrixProduct(output,0);
+    
 
-	for (int j=0; j < matrixNumber ; j++){
-        for (int i = 0; i < N; i++) { 
-            int* p;
-            param[i].counter = j;
-            param[i].thread = i; 
-            pthread_create(&threads[i], NULL, matrixProduct, (void *) &param[i]); 
+	uint32_t divisor = 1;
+	for (uint32_t j=0; j < matrixNumber ; j++){
+        if(rowsA[j] > (rowsA[j]/4)*4) divisor = 2;
+        else divisor = 1;
+        for (uint32_t i = 0; i < N/divisor; i++) { 
+            p[0] = j;
+            p[1] = divisor;
+            pthread_create(&threads[i], NULL, matrixProduct, (void*)(p)); 
         }
-        for (int i = 0; i < N; i++)  
-            pthread_join(threads[i], NULL);  
+        step_i = 0; 
+        for (uint32_t k = 0; k < N; k++)  
+            pthread_join(threads[k], NULL);  
     }
+
+    // for (uint32_t i=0 ; i < matrixNumber; i++) {
+    //     for(uint32_t j=0; j < rowsB[i]; j++) {
+    //         for(uint32_t k=0; k < columnsB[i]; k++){
+    //             if (matrixB[i][(j*columnsB[i])+k] >= 0) printf(" ");
+    //             if (abs(matrixB[i][(j*columnsB[i])+k]) < 10) printf(" ");
+    //             if (abs(matrixB[i][(j*columnsB[i])+k]) < 100) printf(" ");
+    //             printf("%0.2f",matrixB[i][(j*columnsB[i])+k]);
+    //         }
+    //         printf("\n");
+    //     }
+    //     printf("\n");
+    // }
 
     for (uint32_t i = 0; i < matrixNumber; i++) {
         fprintf(output,"M%d\n",i);
